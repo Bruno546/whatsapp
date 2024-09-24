@@ -1,0 +1,24 @@
+zabbix_export:
+  version: '7.0'
+  media_types:
+    - name: 'Alertas WhatsApp'
+      type: SCRIPT
+      script_name: beezap.sh
+      parameters:
+        - sortorder: '0'
+          value: '{ALERT.SENDTO}'
+        - sortorder: '1'
+          value: '{ALERT.SUBJECT}'
+        - sortorder: '2'
+          value: '{ALERT.MESSAGE}'
+      max_sessions: '0'
+      attempts: '20'
+      message_templates:
+        - event_source: TRIGGERS
+          operation_mode: PROBLEM
+          subject: '*Alerta de Novo Incidente* ❌'
+          message: '\n\n*Iniciado em*: {EVENT.TIME}\n*Problema*: {EVENT.NAME}\n*Host*: {HOST.NAME}\n*Item*: {ITEM.NAME}\n*IP*: {HOST.IP}\n*Severidade*: {EVENT.SEVERITY}\n*Status Anterior*: {?last(//{ITEM.KEY},#2)}\n*Status Atual*: {EVENT.OPDATA}\n*Ação*: Por favor, verificar dispositivo ❌'
+        - event_source: TRIGGERS
+          operation_mode: RECOVERY
+          subject: '*Alerta de Resolução de Incidente* ✅'
+          message: '\n\n*Resolvido em*: {EVENT.RECOVERY.TIME} de {EVENT.RECOVERY.DATE}\n*Problema*: {EVENT.NAME}\n*Duração*: {EVENT.DURATION}\n*Host*: {HOST.NAME}\n*IP*: {HOST.IP}\n*Severidade*: {EVENT.SEVERITY}\n*Status Anterior*: {?last(//{ITEM.KEY},#2)}\n*Status Atual*: {EVENT.OPDATA}\n*Ação*: O Incidente foi resolvido ✅'
